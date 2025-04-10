@@ -10,7 +10,6 @@
       padding: 0;
       overflow: hidden;
       height: 100%;
-      touch-action: manipulation;
     }
     canvas {
       display: block;
@@ -45,10 +44,10 @@
   let score = 0;
 
   const bg = new Image();
-  bg.src = '피크닉배경.jpg'; // 배경 이미지
+  bg.src = '피크닉배경.jpg';
 
   const character = new Image();
-  character.src = '호두캐릭터.png'; // 캐릭터 이미지
+  character.src = '호두캐릭터.png';
 
   const breadImgs = ['bread1.png', 'bread2.png', 'bread3.png'];
   const breads = [];
@@ -105,25 +104,20 @@
     requestAnimationFrame(draw);
   }
 
-  // PC
+  // PC 이동
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') characterPos.x -= characterPos.speed;
     if (e.key === 'ArrowRight') characterPos.x += characterPos.speed;
   });
 
-  // Mobile Touch Support
-  let startX = null;
-  canvas.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-  });
-
-  canvas.addEventListener('touchmove', e => {
-    if (!startX) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - startX;
-    characterPos.x += diff * 0.2;
-    startX = currentX;
-  });
+  // 모바일 터치 즉시 이동
+  canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    characterPos.x = touch.clientX - rect.left - characterPos.width / 2;
+    characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
+  }, { passive: false });
 
   setInterval(createBread, 1000);
   draw();
